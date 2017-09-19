@@ -1,17 +1,21 @@
+#!/usr/bin/python
 # -*- Python -*-
 # -*- coding: latin-1 -*-
 import math
 import random
+from timeit import default_timer as timer
 
 class Connexion(object):
-    def __init__(self, From = -1, To = -1, w = 0.0):
+    def __init__(self, From = None, To = None, w = None):
         """blah"""
         self.From = From
         self.To = To
-        self.w = w
+        if w is None: self.w = random.random()-0.5
+        else: self.w = w
 
-    def setW(self, w):
-        self.w = w
+    def setW(self, w = None):
+        if w is None: self.w = random.random()
+        else: self.w = w
 
     def getW(self):
         return self.w
@@ -32,11 +36,19 @@ class Neuron(object):
     def __init__(self, id = -1):
         """blah"""
         self.Id = id
-        self.sum = 0.1
+        self.sum = 0.0
         self.output = 0.0
+        self.isInput = False
+        self.isOutput = False
         
     def getOutput(self):
         return self.output
+        
+    def amIOutput(self):
+        return self.isOutput
+        
+    def amIInput(self):
+        return self.isInput
         
     def getId(self):
         return self.Id
@@ -45,59 +57,72 @@ class Neuron(object):
         self.sum += value
         
     def compute(self):
-        print self.sum
-        self.output = 1.0/(1.0+math.exp(-5.0*self.sum))
+        self.output = 1.0/(1.0+math.exp(-self.sum))
         self.sum = 0.0
 
 
 class Network(object):
     def __init__(self, nbNeurons = 5, nbConnexions = 5):
-        self.nbNeurons = nbNeurons
+        self.nbNeurons = 0
         self.neuronList = []
-        self.nbConnexions = nbConnexions
+        self.nbConnexions = 0
         self.connexionList = []
         self.toggle = False
         # creating neurons
         for idNeuron in range(nbNeurons):
-            self.neuronList.append(Neuron(idNeuron))
+            self.createNeuron()
 
         # creating connexions
         for idConnexion in range(nbConnexions):
-            neuron1 = random.randint(0,nbNeurons-1)
-            neuron2 = random.randint(0,nbNeurons-1)
-            #
-            # while neuron1 == neuron2:
-                # neuron2 = random.randint(0,nbNeurons-1)
-            #
-            # self.connexionList.append(Connexion(neuron1,neuron2,random.random()))
-            self.connexionList.append(Connexion(self.neuronList[neuron1],self.neuronList[neuron2],random.random()))
+            self.createConnexion()
             
     def printNetwork(self):
+        print "There are "+str(self.nbConnexions)+" connexions"
         for connexion in self.connexionList:
-            print "I am a connexion and I link "+str(connexion.getFrom().getId()) + " to " + str(connexion.getTo().getId()) + " with a force " + str(connexion.getW())
+            print "I am a connexion and I link "+str(connexion.getFrom().getId()) + "\tto " + str(connexion.getTo().getId()) + "\twith a force " + str(connexion.getW())
+        print "There are "+str(self.nbNeurons)+" neurons"
         for neuron in self.neuronList:
-            print "I am a neuron, my name is "+str(neuron.getId()) +" and my output is ["+str(neuron.getOutput())+"]"
+            print "I am a neuron, my name is "+str(neuron.getId()) +"\tand my output is ["+str(neuron.getOutput())+"]"
             
     def evaluateNetwork(self):
-        print "\nEvaluating...\n"
         for connexion in self.connexionList:
-            # self.neuronList[connexion.getTo()].updateSum(self.neuronList[connexion.getFrom()].getOutput() * connexion.getW())
             connexion.getTo().updateSum(connexion.getFrom().getOutput() * connexion.getW())
         for neuron in self.neuronList:
             neuron.compute()
 
-    # def updateConnexion(self):
-    # def createConnexion(self):
-    # def deleteConnexion(self):
-    # def createNeuron(self):
-    # def deleteNeuron(self):
+    def createConnexion(self):
+        neuron1 = random.randint(0,nbNeurons-1)
+        neuron2 = random.randint(0,nbNeurons-1)
+        while self.neuronList[neuron1].amIOutput() : neuron1 = random.randint(0,nbNeurons-1)
+        while self.neuronList[neuron2].amIInput() : neuron2 = random.randint(0,nbNeurons-1)
+        self.connexionList.append(Connexion(self.neuronList[neuron1],self.neuronList[neuron2]))
+        self.nbConnexions += 1
+        
+    def deleteConnexion(self, connexion):        
+        self.connexionList.remove(connexion)
+        self.nbConnexions -= 1
+    
+    def createNeuron(self):
+        self.neuronList.append(Neuron(self.nbNeurons))
+        self.nbNeurons += 1
+        
+    def deleteNeuron(self, neuron): 
+        self.neuronList.remove(neuron)
+        self.nbNeurons -= 1
 
+nbNeurons = 5
+nbConnexions = 8
+george = Network(nbNeurons, nbConnexions)
+george.evaluateNetwork()
+# george.printNetwork()
+start = timer()
+for i in range(100):
+    george.evaluateNetwork()
+george.evaluateNetwork()
+end = timer()
+george.printNetwork()
 
-george = Network(15, 30)
-george.printNetwork()
-george.evaluateNetwork()
-george.evaluateNetwork()
-george.printNetwork()
+print(end - start)  
 
 
 
