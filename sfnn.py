@@ -69,18 +69,20 @@ class Network(object):
             # while neuron1 == neuron2:
                 # neuron2 = random.randint(0,nbNeurons-1)
             #
-            self.connexionList.append(Connexion(neuron1,neuron2,random.random()))
+            # self.connexionList.append(Connexion(neuron1,neuron2,random.random()))
+            self.connexionList.append(Connexion(self.neuronList[neuron1],self.neuronList[neuron2],random.random()))
             
     def printNetwork(self):
         for connexion in self.connexionList:
-            print "I am a connexion and I link "+str(connexion.getFrom()) + " to " + str(connexion.getTo()) + " with a force " + str(connexion.getW())
+            print "I am a connexion and I link "+str(connexion.getFrom().getId()) + " to " + str(connexion.getTo().getId()) + " with a force " + str(connexion.getW())
         for neuron in self.neuronList:
             print "I am a neuron, my name is "+str(neuron.getId()) +" and my output is ["+str(neuron.getOutput())+"]"
             
     def evaluateNetwork(self):
         print "\nEvaluating...\n"
         for connexion in self.connexionList:
-            self.neuronList[connexion.getTo()].updateSum(self.neuronList[connexion.getFrom()].getOutput() * connexion.getW())
+            # self.neuronList[connexion.getTo()].updateSum(self.neuronList[connexion.getFrom()].getOutput() * connexion.getW())
+            connexion.getTo().updateSum(connexion.getFrom().getOutput() * connexion.getW())
         for neuron in self.neuronList:
             neuron.compute()
 
