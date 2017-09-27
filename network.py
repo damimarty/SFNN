@@ -17,28 +17,55 @@ import math
 
 class Network(object):
 
-	def __init__(self, nbNeurons = 5, nbConnexions = 5, nbInputsNeurons = 2, nbOutputsNeurons = 1):
-		self.nbNeurons = 0
-		self.neuronList = []
-		self.inputNeuronList = []
-		self.outputNeuronList= []
-		self.nbConnexions = 0
-		self.connexionList = []
-		self.species = str(self.nbNeurons)+"_"+str(self.nbConnexions)
-		self.toggle = False
-		self.fitness = random.random()
-		for idNeuron in range(nbNeurons-nbInputsNeurons-nbOutputsNeurons):
-			self.createNeuron()
-		for idInputNeuron in range(nbInputsNeurons):
-			self.createNeuron("input")
-		for idOutputNeuron in range(nbOutputsNeurons):
-			self.createNeuron("output")
-		for idConnexion in range(nbConnexions):
-			self.createConnexion()
+	def __init__(self, nbNeurons = 5, nbConnexions = 5, nbInputsNeurons = 2, nbOutputsNeurons = 1, genes = None):
+		if(genes != None):
+			neuronGenes = genes[0]
+			connexionGenes = genes[1]
+			# print(neuronGenes)
+			# print(connexionGenes)
+			self.nbNeurons = 0
+			self.neuronList = []
+			self.inputNeuronList = []
+			self.outputNeuronList= []
+			self.connexionList = []
+			for neuronGene in neuronGenes:
+				neuron = None
+				if neuronGene[1] == 'n':
+					neuron = Neuron(self.nbNeurons,bias=neuronGene[0])
+				elif neuronGene[1] == 'i':
+					neuron = InputNeuron(self.nbNeurons,bias=neuronGene[0])
+					self.inputNeuronList.append(neuron)
+				elif neuronGene[1] == 'o':
+					neuron = OutputNeuron(self.nbNeurons,bias=neuronGene[0])
+					self.outputNeuronList.append(neuron)
+				self.neuronList.append(neuron)
+			for connGene in connexionGenes:
+				fromNeuron = self.neuronList[connGene[0]]
+				toNeuron = self.neuronList[connGene[1]]
+				self.connexionList.append(Connexion(fromNeuron,toNeuron,connGene[2]))
+		else:
+			self.nbNeurons = 0
+			self.neuronList = []
+			self.inputNeuronList = []
+			self.outputNeuronList= []
+			self.nbConnexions = 0
+			self.connexionList = []
+			self.species = str(self.nbNeurons)+"_"+str(self.nbConnexions)
+			self.toggle = False
+			self.fitness = random.random()
+			for idInputNeuron in range(nbInputsNeurons):
+				self.createNeuron("input")
+			for idNeuron in range(nbNeurons-nbInputsNeurons-nbOutputsNeurons):
+				self.createNeuron()
+			for idOutputNeuron in range(nbOutputsNeurons):
+				self.createNeuron("output")
+			for idConnexion in range(nbConnexions):
+				self.createConnexion()
 
 	def getNeuronPosition(self, neuron):
 		return self.neuronList.index(neuron)
-	def sortConnexions(self):
+
+	def sortedConnexions(self):
 		sortedConnexionList = []
 		for connex in self.connexionList:
 			indexFrom = self.getNeuronPosition(connex.getFrom())
@@ -50,9 +77,16 @@ class Network(object):
 	def getGenes(self):
 		genesNeurons = []
 		genesConnexions = []
-		for neuneu in self.neuronList:
-			genesNeurons.append(neuneu.bias)
-		return genesNeurons, self.sortConnexions()
+		for n in self.neuronList:
+			t = "n"
+			if type(n) is InputNeuron:
+				t = "i"
+			elif type(n) is OutputNeuron:
+				t = "o"
+			genesNeurons.append((n.bias,t))
+		for c in self.sortedConnexions():
+			genesConnexions.append((c.getFrom(),c.getTo(),c.getW()))
+		return genesNeurons, genesConnexions
 
 	def printNetwork(self):
 		print "My species is "+self.species
@@ -136,7 +170,7 @@ class Network(object):
 
 	def draw(self):
 
-		self.g = pgv.AGraph()
+		self.g = pgv.AGraph(directed=True)
 
 		for node in self.neuronList:
 
@@ -151,22 +185,10 @@ class Network(object):
 		for conn in self.connexionList:
 			f = str(conn.From.Id)
 			t = str(conn.To.Id)
-			self.g.add_edge(f,t,color="red",penwidth=(conn.w+1)*2)
+			self.g.add_edge(f,t,arrowhead="normal",arrowsize=1.0,color="red",penwidth=(conn.w+1)*2)
 
-		"""
-		for node in self.g.nodes
-			c = "blue"
-			if conn is OutputNeuron:
-				c = "green"
-			elif conn is InputNeuron:
-				c = "red"
-
-		"""
-
-		#self.g.add_edges_from(indexConnexionList)
-		#self.g.node_attr.update(color="red")
 		print(self.g.string())
-		print(self.g.write('net.dot'))
+		self.g.write('net.dot')
 
 		gFile=pgv.AGraph('net.dot') # create a new graph from file
 		gFile.layout() # layout with default (neato)
