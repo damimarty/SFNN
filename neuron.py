@@ -10,6 +10,7 @@ class Neuron(object):
 		"""blah"""
 		self.Id = id
 		self.sum = 0.0
+		self.bias = random.random()
 		self.output = random.random()
 
 	def getOutput(self):
@@ -38,4 +39,3 @@ class InputNeuron(Neuron):
 
     def compute(self):
         self.output = self.sum
-
