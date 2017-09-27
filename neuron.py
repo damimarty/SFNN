@@ -39,3 +39,11 @@ class InputNeuron(Neuron):
     def compute(self):
         self.output = self.sum
 
+class OutputNeuron(Neuron):
+
+	def __init__(self, id = -1):
+		Neuron.__init__(self,id)
+		self.isOutput = True
+
+	def getOutput(self):
+		return self.output

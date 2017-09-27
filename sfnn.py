@@ -13,8 +13,8 @@ from network import Network
 from population import Population
 
 def testNetwork():
-	nbNeurons = 5
-	nbConnexions = 8
+	nbNeurons = 10
+	nbConnexions = 10
 	george = Network(nbNeurons, nbConnexions)
 	george.evaluateNetwork()
 	george.printNetwork()

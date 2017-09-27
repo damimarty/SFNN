@@ -5,6 +5,7 @@
 from connexion import Connexion
 from neuron import Neuron
 from neuron import InputNeuron
+from neuron import OutputNeuron
 
 import pygraphviz as pgv
 
@@ -26,7 +27,7 @@ class Network(object):
 		self.species = str(self.nbNeurons)+"_"+str(self.nbConnexions)
 		self.toggle = False
 		self.fitness = random.random()
-		for idNeuron in range(nbNeurons):
+		for idNeuron in range(nbNeurons-nbInputsNeurons-nbOutputsNeurons):
 			self.createNeuron()
 		for idInputNeuron in range(nbInputsNeurons):
 			self.createNeuron("input")
@@ -90,6 +91,10 @@ class Network(object):
 			neuron = InputNeuron(self.nbNeurons)
 			self.neuronList.append(neuron)
 			self.inputNeuronList.append(neuron)
+		elif type == "output":
+			neuron = OutputNeuron(self.nbNeurons)
+			self.neuronList.append(neuron)
+			self.outputNeuronList.append(neuron)
 		else:
 			neuron = Neuron(self.nbNeurons)
 			self.neuronList.append(neuron)
@@ -113,13 +118,35 @@ class Network(object):
 
 	def draw(self):
 
-		indexConnexionList = []
-		for conn in self.connexionList:
-			indexConnexionList.append(str(self.neuronList.index(conn.From))+str(self.neuronList.index(conn.To)))
-
-		print(indexConnexionList)
 		self.g = pgv.AGraph()
-		self.g.add_edges_from(indexConnexionList)
+
+		for node in self.neuronList:
+
+			color = "white"
+			if type(node) is OutputNeuron:
+				color = "red"
+			elif type(node) is InputNeuron:
+				color = "blue"
+			print(node.Id,color)
+			self.g.add_node(str(node.Id),style="filled",fillcolor=color)
+
+		for conn in self.connexionList:
+			f = str(conn.From.Id)
+			t = str(conn.To.Id)
+			self.g.add_edge(f,t,color="red",penwidth=(conn.w+1)*2)
+
+		"""
+		for node in self.g.nodes
+			c = "blue"
+			if conn is OutputNeuron:
+				c = "green"
+			elif conn is InputNeuron:
+				c = "red"
+
+		"""
+
+		#self.g.add_edges_from(indexConnexionList)
+		#self.g.node_attr.update(color="red")
 		print(self.g.string())
 		print(self.g.write('net.dot'))
 
