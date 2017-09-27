@@ -18,6 +18,7 @@ import math
 class Network(object):
 
 	def __init__(self, nbNeurons = 5, nbConnexions = 5, nbInputsNeurons = 2, nbOutputsNeurons = 1, genes = None):
+		self.fitness = 1.0
 		if(genes != None):
 			neuronGenes = genes[0]
 			connexionGenes = genes[1]
@@ -39,10 +40,13 @@ class Network(object):
 					neuron = OutputNeuron(self.nbNeurons,bias=neuronGene[0])
 					self.outputNeuronList.append(neuron)
 				self.neuronList.append(neuron)
+				self.nbNeurons += 1
 			for connGene in connexionGenes:
 				fromNeuron = self.neuronList[connGene[0]]
 				toNeuron = self.neuronList[connGene[1]]
 				self.connexionList.append(Connexion(fromNeuron,toNeuron,connGene[2]))
+			self.nbConnexions = len(self.connexionList)
+			self.species = str(self.nbNeurons)+"_"+str(self.nbConnexions)
 		else:
 			self.nbNeurons = 0
 			self.neuronList = []
@@ -51,8 +55,6 @@ class Network(object):
 			self.nbConnexions = 0
 			self.connexionList = []
 			self.species = str(self.nbNeurons)+"_"+str(self.nbConnexions)
-			self.toggle = False
-			self.fitness = random.random()
 			for idInputNeuron in range(nbInputsNeurons):
 				self.createNeuron("input")
 			for idNeuron in range(nbNeurons-nbInputsNeurons-nbOutputsNeurons):
@@ -173,7 +175,6 @@ class Network(object):
 		self.g = pgv.AGraph(directed=True)
 
 		for node in self.neuronList:
-
 			color = "white"
 			if type(node) is OutputNeuron:
 				color = "red"
@@ -197,4 +198,4 @@ class Network(object):
 		img=mpimg.imread('net.png')
 		imgplot = plt.imshow(img)
 
-		plt.show()
+		#plt.show()
