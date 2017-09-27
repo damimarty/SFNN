@@ -6,11 +6,14 @@ import random
 import math
 
 class Neuron(object):
-	def __init__(self, id = -1):
+	def __init__(self, id = -1, bias = None):
 		"""blah"""
 		self.Id = id
 		self.sum = 0.0
-		self.bias = random.random()
+		if bias:
+			self.bias = bias
+		else:
+			self.bias = random.random()
 		self.output = random.random()
 
 	def getOutput(self):
@@ -27,8 +30,8 @@ class Neuron(object):
 		self.sum = 0.0
 
 class InputNeuron(Neuron):
-    def __init__(self, id = -1):
-        Neuron.__init__(self,id)
+    def __init__(self, id = -1, bias = None):
+        Neuron.__init__(self,id,bias)
 
     def setInput(self, inputValue):
         # coerce to [1:0] ?
@@ -42,8 +45,8 @@ class InputNeuron(Neuron):
 
 class OutputNeuron(Neuron):
 
-	def __init__(self, id = -1):
-		Neuron.__init__(self,id)
+	def __init__(self, id = -1, bias = None):
+		Neuron.__init__(self,id,bias)
 		self.isOutput = True
 
 	def getOutput(self):
