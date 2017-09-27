@@ -35,11 +35,29 @@ class Network(object):
 		for idConnexion in range(nbConnexions):
 			self.createConnexion()
 
+	def getNeuronPosition(self, neuron):
+		return self.neuronList.index(neuron)
+	def sortConnexions(self):
+		sortedConnexionList = []
+		for connex in self.connexionList:
+			indexFrom = self.getNeuronPosition(connex.getFrom())
+			indexTo = self.getNeuronPosition(connex.getTo())
+			sortedConnexionList.append(Connexion(indexFrom,indexTo,connex.getW()))
+		sortedConnexionList = sorted(sortedConnexionList, key = lambda c: (c.getFrom(), c.getTo()))
+		return sortedConnexionList
+
+	def getGenes(self):
+		genesNeurons = []
+		genesConnexions = []
+		for neuneu in self.neuronList:
+			genesNeurons.append(neuneu.bias)
+		return genesNeurons, self.sortConnexions()
+
 	def printNetwork(self):
 		print "My species is "+self.species
 		print "There are "+str(self.nbConnexions)+" connexions"
 		for connexion in self.connexionList:
-			print "I am a connexion and I link "+str(connexion.getFrom().getId()) + "\tto " + str(connexion.getTo().getId()) + "\twith a force " + str(connexion.getW())
+			print connexion
 		print "There are "+str(self.nbNeurons)+" neurons"
 		for neuron in self.neuronList:
 			print "I am a neuron, my name is "+str(neuron.getId()) +"\tand my output is ["+str(neuron.getOutput())+"]"
