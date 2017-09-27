@@ -60,5 +60,5 @@ class Genetics(object):
         split = int(random.random()*len(connexions1))
         connexionsChild = connexions1[0:split]
         connexionsChild.extend(connexions2[split:])
-        child = Network(neuronsChild,connexionsChild,parent1.nbInputNeurons,parent1.nbOutputNeurons)
+        child = Network(genes = (neuronsChild,connexionsChild))
         return child
