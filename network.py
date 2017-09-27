@@ -19,7 +19,7 @@ class Network(object):
 		self.connexionList = []
 		self.species = str(self.nbNeurons)+"_"+str(self.nbConnexions)
 		self.toggle = False
-		self.fitness = 0.0
+		self.fitness = random.random()
 		for idNeuron in range(nbNeurons):
 			self.createNeuron()
 		for idInputNeuron in range(nbInputsNeurons):

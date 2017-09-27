@@ -55,18 +55,15 @@ def testOutputNetwork():
 	plt.show()
 
 def testPopulation():
-	nbPeople = 100
+	nbPeople = 10
 	nbNeurons = 50
 	nbConnexions = 80
 	start = timer()
 	ofTheJungle = Population(nbPeople, nbNeurons, nbConnexions)
-	end = timer()
-	print(end - start)
-	start = timer()
-	ofTheJungle.run(100)
-	end = timer()
-	print(end - start)
+	print(ofTheJungle)
+	ofTheJungle.sortByFitness()
+	print(ofTheJungle)
 
 # testNetwork()
-#testPopulation()
-testOutputNetwork()
+testPopulation()
+# testOutputNetwork()

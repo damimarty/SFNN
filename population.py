@@ -19,3 +19,12 @@ class Population(object):
 		for time in range(nbTimes):
 			for idPeople in range(self.nbPeople):
 				self.peopleList[idPeople].evaluateNetwork()
+
+	def sortByFitness(self):
+		self.peopleList = sorted(self.peopleList, key = lambda people: people.getFitness())
+	
+	def __str__(self):
+		ret = ""
+		for idPeople in range(self.nbPeople):
+				ret += "\n "+ str(self.peopleList[idPeople].getFitness())
+		return ret
