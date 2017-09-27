@@ -25,6 +25,7 @@ def testNetwork():
 	end = timer()
 	george.printNetwork()
 	print(end - start)
+	george.draw()
 
 def testOutputNetwork():
 	nbNeurons = 10
@@ -64,6 +65,6 @@ def testPopulation():
 	ofTheJungle.sortByFitness()
 	print(ofTheJungle)
 
-# testNetwork()
-testPopulation()
+testNetwork()
+#testPopulation()
 # testOutputNetwork()

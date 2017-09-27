@@ -5,6 +5,12 @@
 from connexion import Connexion
 from neuron import Neuron
 from neuron import InputNeuron
+
+import pygraphviz as pgv
+
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
 import random
 import math
 
@@ -104,3 +110,24 @@ class Network(object):
 
 	def getFitness(self):
 		return self.fitness
+
+	def draw(self):
+
+		indexConnexionList = []
+		for conn in self.connexionList:
+			indexConnexionList.append(str(self.neuronList.index(conn.From))+str(self.neuronList.index(conn.To)))
+
+		print(indexConnexionList)
+		self.g = pgv.AGraph()
+		self.g.add_edges_from(indexConnexionList)
+		print(self.g.string())
+		print(self.g.write('net.dot'))
+
+		gFile=pgv.AGraph('net.dot') # create a new graph from file
+		gFile.layout() # layout with default (neato)
+		gFile.draw('net.png') # draw png
+
+		img=mpimg.imread('net.png')
+		imgplot = plt.imshow(img)
+
+		plt.show()
