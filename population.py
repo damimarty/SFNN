@@ -21,8 +21,8 @@ class Population(object):
 				self.peopleList[idPeople].evaluateNetwork()
 
 	def sortByFitness(self):
-		self.peopleList = sorted(self.peopleList, key = lambda people: people.getFitness())
-	
+		self.peopleList = sorted(self.peopleList, key = lambda people: -people.getFitness())
+
 	def __str__(self):
 		ret = ""
 		for idPeople in range(self.nbPeople):
