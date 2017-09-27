@@ -64,6 +64,22 @@ class Network(object):
 			for idConnexion in range(nbConnexions):
 				self.createConnexion()
 
+	def isSame(self,other):
+		return self.isSameGenome(self.getGenes(),other.getGenes())
+
+	@staticmethod
+	def isSameGenome((n1,c1),(n2,c2)):
+		# neurons
+		same = True
+		for nelem1,nelem2 in zip(n1,n2):
+			if((nelem1[0] != nelem2[0]) or (nelem1[1] != nelem2[1])):
+				same = False
+		# connexions
+		for nelem1,nelem2 in zip(c1,c2):
+			if((nelem1[0] != nelem2[0]) or (nelem1[1] != nelem2[1]) or (nelem1[2] != nelem2[2])):
+				same = False
+		return same
+
 	def getNeuronPosition(self, neuron):
 		return self.neuronList.index(neuron)
 

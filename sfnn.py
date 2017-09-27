@@ -11,10 +11,11 @@ from connexion import Connexion
 from neuron import Neuron
 from network import Network
 from population import Population
+from genetics import Genetics
 
 def testNetwork():
 	nbNeurons = 10
-	nbConnexions = 10
+	nbConnexions = 15
 	george = Network(nbNeurons, nbConnexions)
 	george.evaluateNetwork()
 	george.printNetwork()
@@ -26,6 +27,55 @@ def testNetwork():
 	george.printNetwork()
 	print(end - start)
 	george.draw()
+
+def testNetwork2():
+	nbNeurons = 10
+	nbConnexions = 15
+	george = Network(nbNeurons, nbConnexions)
+	ggenes = george.getGenes()
+	print(ggenes)
+	# george.draw()
+	francis = Network(genes=ggenes)
+	fgenes = francis.getGenes()
+	print(fgenes)
+
+def testGenetics():
+	base = Network(5, 2, 2, 1)
+	baseGenome = base.getGenes()
+	pool = Genetics(nbPeople = 30, genome = baseGenome)
+
+	individualSpecies = []
+	speciesData = []
+
+	for i in range(50):
+		pool.step()
+		sp = pool.getSpieces()
+		for gsp,c in sp:
+			if gsp not in individualSpecies:
+				individualSpecies.append(gsp)
+		speciesData.append(sp)
+		pool.loop()
+
+	evolution = [[] for i in range(len(individualSpecies))]
+	print(len(evolution))
+
+	for data in speciesData:
+		for g in individualSpecies:
+			found = False
+			for genome,count in data:
+				#print(genome,g)
+				if Network.isSameGenome(genome,g):
+					found = True
+					evolution[individualSpecies.index(genome)].append(count)
+			if not found:
+				evolution[individualSpecies.index(g)].append(0)
+
+	for speEvo in evolution:
+		plt.plot(speEvo)
+
+	plt.show()
+
+	#for d in speicesData
 
 def testOutputNetwork():
 	nbNeurons = 10
@@ -65,6 +115,6 @@ def testPopulation():
 	ofTheJungle.sortByFitness()
 	print(ofTheJungle)
 
-testNetwork()
+testGenetics()
 #testPopulation()
 # testOutputNetwork()
