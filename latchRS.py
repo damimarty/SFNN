@@ -48,55 +48,56 @@ def train1():
 		pool.train(500,50)
 		return (pool.computeEvolution(),pool.fitnesses)
 
-	evolution, fitness = train()
+		g, evolution, fitness = train()
 
-	if(evolution):
-		for speEvo in evolution:
-			plt.plot(speEvo)
+		if(evolution):
+			for speEvo in evolution:
+				plt.plot(speEvo)
+		plt.figure()
+		plt.plot(fitness)
+		plt.show()
+
+def train2():
+	# Create our base Network
+	base = Network(7, 10, 2, 1)
+	base.printNetwork()
+	baseGenome = base.getGenes()
+	pool = Genetics(genomes = [baseGenome])
+	pool.setProblem(latchRS())
+	pool.train(200,75)
+	# evolution = pool.computeEvolution()
+
+	bestPeople = pool.generationN.getFirsts(1)[0]
+	bestPeople.printNetwork()
+	print bestPeople.fitness
+
+	# for speEvo in evolution:
+	# plt.plot(speEvo)
+
+	# plt.figure()
+	# plt.plot(pool.fitnesses)
+	# plt.figure()
+
+	tester = latchRS()
+	a_inputR = []
+	a_inputS = []
+	a_expected = []
+	a_output = []
+	for i in range(250):
+		inputArray = tester.getInputs()
+		iSet, iReset = inputArray
+		expected = tester.run(inputArray)
+		a_inputR.append((iReset/5.0)-0.6)
+		a_inputS.append((iSet/5.0)-0.3)
+		a_expected.append(expected)
+		bestPeople.setInput(inputArray)
+		bestPeople.evaluateNetwork()
+		a_output.append(bestPeople.getOutput())
+
+	plt.plot(a_inputR)
+	plt.plot(a_inputS)
+	plt.plot(a_expected)
 	plt.figure()
-	plt.plot(fitness)
-	plt.show()
+	plt.plot(a_output)
 
-def train2()
-    # Create our base Network
-    base = Network(7, 10, 2, 1)
-    base.printNetwork()
-    baseGenome = base.getGenes()
-    pool = Genetics(genome = baseGenome)
-    pool.setProblem(latchRS())
-    pool.train(200,75)
-    # evolution = pool.computeEvolution()
-
-    bestPeople = pool.generationN.getFirsts(1)[0]
-    bestPeople.printNetwork()
-    print bestPeople.fitness
-
-    # for speEvo in evolution:
-        # plt.plot(speEvo)
-
-    # plt.figure()
-    # plt.plot(pool.fitnesses)
-    # plt.figure()
-
-    tester = latchRS()
-    a_inputR = []
-    a_inputS = []
-    a_expected = []
-    a_output = []
-    for i in range(250):
-        inputArray = tester.getInputs()
-        iSet, iReset = inputArray
-        expected = tester.run(inputArray)
-        a_inputR.append((iReset/5.0)-0.6)
-        a_inputS.append((iSet/5.0)-0.3)
-        a_expected.append(expected)
-        bestPeople.setInput(inputArray)
-        bestPeople.evaluateNetwork()
-        a_output.append(bestPeople.getOutput())
-    plt.plot(a_inputR)
-    plt.plot(a_inputS)
-    plt.plot(a_expected)
-    plt.figure()
-    plt.plot(a_output)
-
-train()
+train2()
