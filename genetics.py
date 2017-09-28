@@ -12,7 +12,7 @@ defaultNbIndividuals = 5
 defaultNbNeurons = 5
 defaultNbConnexions = 8
 class Genetics(object):
-    def __init__(self, nbPeople = 100, nbNeu = 10, nbConn = 10, nbNeuInput = 2, nbNeuOutput = 1, genome = None):
+    def __init__(self, nbPeople = 100, nbNeu = 10, nbConn = 10, nbNeuInput = 2, nbNeuOutput = 1, genomes = None):
         self.pbaNewNeuron = 0.02
         self.pbaNewConnexion = 0.05
         self.pbaChangeConnexion = 0.05
@@ -22,9 +22,9 @@ class Genetics(object):
         self.wheelSize = 0.0
 
         # Our parent generation
-        self.generationN = Population(nbPeople, nbNeu, nbConn, nbNeuInput, nbNeuOutput, genome)
+        self.generationN = Population(nbPeople, nbNeu, nbConn, nbNeuInput, nbNeuOutput, genomes)
         # Our child generation
-        self.generationNplusOne = Population(nbPeople, nbNeu, nbConn, nbNeuInput, nbNeuOutput, genome)
+        self.generationNplusOne = Population(nbPeople, nbNeu, nbConn, nbNeuInput, nbNeuOutput, genomes)
         self.computeWheelSize()
 
         self.fitnesses = []
@@ -32,6 +32,7 @@ class Genetics(object):
         self.individualSpecies = []
 
         self.problem = None
+        self.saveEvolution = False
 
     def setProblem(self,pb):
         self.problem = pb
@@ -52,20 +53,23 @@ class Genetics(object):
                         nn.evaluateNetwork()
                         o2 = nn.getOutput()
                         error += self.problem.error(o2,o1)
-                    nn.setFitness(1/(1+(error/nEvaluations)))
+                    nn.setFitness(0.1/(0.1+(error/nEvaluations)))
                 print("eval",time.time()-t)
                 # Save genetics data of the current generation
-                t = time.time()
-                self.saveData()
-                print("save",time.time()-t)
+                if(self.saveEvolution):
+                    # t = time.time()
+                    self.saveData()
+                    # print("save",time.time()-t)
+                # Save fitness
+                self.saveFitness()
                 # Do a genetic step
-                t = time.time()
+                # t = time.time()
                 self.step()
-                print("step",time.time()-t)
+                # print("step",time.time()-t)
                 # Copy child generation -> parent generation
-                t = time.time()
+                # t = time.time()
                 self.loop()
-                print("loop",time.time()-t)
+                # print("loop",time.time()-t)
                 print("next age : %d"%i)
         else:
             print("no problem defined")
@@ -80,7 +84,11 @@ class Genetics(object):
         for i in range(self.generationN.size()-self.elitism):
             self.generationNplusOne.append(self.fornicate())
 
-    def saveData(self):
+    def saveFitness(self):
+        # Get the best fitnesses
+        self.fitnesses.append(self.generationN.getBestFitness())
+
+    def saveEvolution(self):
         # Get the best fitnesses
         self.fitnesses.append(self.generationN.getBestFitness())
         sp = self.getSpieces()

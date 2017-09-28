@@ -5,10 +5,12 @@
 from network import Network
 
 class Population(object):
-	def __init__(self, nbPeople, nbNeurons = 5, nbConnexions = 5, nbInputs = 2, nbOutputs = 1, genome = None):
+	def __init__(self, nbPeople, nbNeurons = 5, nbConnexions = 5, nbInputs = 2, nbOutputs = 1, genomes = None):
 		self.peopleList = []
-		for idPeople in range(nbPeople):
-			self.createNetwork(nbNeurons, nbConnexions, nbInputs, nbOutputs, genome)
+		divisions = len(genomes)
+		for i in range(divisions):
+			for j in range(nbPeople/divisions):
+				self.createNetwork(nbNeurons, nbConnexions, nbInputs, nbOutputs, genomes[i])
 
 	def createNetwork(self, nbNeurons = 5, nbConnexions = 5, nbInputs = 2, nbOutputs = 1, genome = None):
 		self.peopleList.append(Network(nbNeurons, nbConnexions, nbInputs, nbOutputs, genome))

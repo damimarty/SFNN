@@ -33,23 +33,26 @@ class latchRS(object):
 	def error(self,o1,o2):
 		if (len(o1) == 1) and (len(o2) == 1):
 			v = o1[0] - o2[0]
+			# print(v)
 			return v**2
 
 
 def train():
 	# Create our base Network
-	base = Network(10, 10, 2, 1)
-	baseGenome = base.getGenes()
-	pool = Genetics(genome = baseGenome)
+	genomes = []
+	for i in range(5):
+		g = Network(5, 10, 2, 1)
+		genomes.append(g.getGenes())
+	pool = Genetics(genomes = genomes)
 	pool.setProblem(latchRS())
 	pool.train(20,50)
-	evolution = pool.computeEvolution()
+	return (pool.computeEvolution(),pool.fitnesses)
 
+evolution, fitness = train()
+
+if(evolution):
 	for speEvo in evolution:
 		plt.plot(speEvo)
-
-	plt.figure()
-	plt.plot(pool.fitnesses)
-	plt.show()
-
-train()
+plt.figure()
+plt.plot(fitness)
+plt.show()

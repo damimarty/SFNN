@@ -18,7 +18,7 @@ import math
 class Network(object):
 
 	def __init__(self, nbNeurons = 5, nbConnexions = 5, nbInputsNeurons = 2, nbOutputsNeurons = 1, genes = None):
-		self.fitness = 1.0
+		self.fitness = 0.0
 		if(genes != None):
 			neuronGenes = genes[0]
 			connexionGenes = genes[1]
@@ -168,8 +168,6 @@ class Network(object):
 		else:
 			neuron = Neuron(self.nbNeurons)
 			self.neuronList.append(neuron)
-			if type == "output":
-				self.outputNeuronList.append(neuron)
 		self.nbNeurons += 1
 
 	def deleteNeuron(self, neuron):
