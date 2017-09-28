@@ -41,11 +41,11 @@ def train():
 	# Create our base Network
 	genomes = []
 	for i in range(5):
-		g = Network(5, 10, 2, 1)
+		g = Network(10, 10, 2, 1)
 		genomes.append(g.getGenes())
 	pool = Genetics(genomes = genomes)
 	pool.setProblem(latchRS())
-	pool.train(20,50)
+	pool.train(500,50)
 	return (pool.computeEvolution(),pool.fitnesses)
 
 evolution, fitness = train()

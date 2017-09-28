@@ -42,7 +42,7 @@ class Genetics(object):
             # N generations
             for i in range(nGenerations):
                 # Iterate over population
-                t = time.time()
+                # t = time.time()
                 for nn in self.generationN.peopleList:
                     error = 0.0
                     inputs = self.problem.getInputs()
@@ -54,7 +54,7 @@ class Genetics(object):
                         o2 = nn.getOutput()
                         error += self.problem.error(o2,o1)
                     nn.setFitness(0.1/(0.1+(error/nEvaluations)))
-                print("eval",time.time()-t)
+                # print("eval",time.time()-t)
                 # Save genetics data of the current generation
                 if(self.saveEvolution):
                     # t = time.time()
@@ -141,23 +141,30 @@ class Genetics(object):
         return self.fornication(p1,p2)
 
     def fornication(self, parent1, parent2):
-        neurons1, connexions1 = parent1.getGenes()
-        neurons2, connexions2 = parent2.getGenes()
-        split = int(random.random()*len(neurons1))
-        neuronsChild = neurons1[0:split]
-        neuronsChild.extend(neurons2[split:])
-        split = int(random.random()*len(connexions1))
-        connexionsChild = connexions1[0:split]
-        connexionsChild.extend(connexions2[split:])
+        # CrossOver
+        neuronsChild,connexionsChild =  self.crossOver(parent1.getGenes(),parent2.getGenes())
         # Mutation part
-        if(self.yesOrNo(self.pbaChangeConnexion)):
-            indexConnMutation = int(len(connexionsChild)*random.random())
-            src, dest, weight = connexionsChild[indexConnMutation]
-            connexionsChild[indexConnMutation] = src, dest, random.random()
-            child = Network(genes = (neuronsChild,connexionsChild))
-        else:
-            child = Network(genes = (neuronsChild,connexionsChild))
+        neuronsChild,connexionsChild =  self.mutate((neuronsChild,connexionsChild))
+        child = Network(genes = (neuronsChild,connexionsChild))
         return child
+
+    def crossOver(self,(n1,c1),(n2,c2)):
+        split = int(random.random()*len(n1))
+        neuronsChild = n1[0:split]
+        neuronsChild.extend(n2[split:])
+        split = int(random.random()*len(c1))
+        connexionsChild = c1[0:split]
+        connexionsChild.extend(c2[split:])
+        return neuronsChild,connexionsChild
+
+    def mutate(self,(n,c)):
+        # connexion weight
+        if(self.yesOrNo(self.pbaChangeConnexion)):
+            indexConnMutation = int(len(c)*random.random())
+            src, dest, weight = c[indexConnMutation]
+            c[indexConnMutation] = src, dest, random.random()
+        return n,c
+
 
     def computeEvolution(self):
         evolution = [[] for i in range(len(self.individualSpecies))]
