@@ -165,7 +165,6 @@ class Genetics(object):
             c[indexConnMutation] = src, dest, random.random()
         return n,c
 
-
     def computeEvolution(self):
         evolution = [[] for i in range(len(self.individualSpecies))]
         print(len(evolution))
