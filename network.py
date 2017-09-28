@@ -15,6 +15,8 @@ import matplotlib.image as mpimg
 import random
 import math
 
+import pickle
+
 class Network(object):
 
 	def __init__(self, nbNeurons = 5, nbConnexions = 5, nbInputsNeurons = 2, nbOutputsNeurons = 1, genes = None):
@@ -213,3 +215,11 @@ class Network(object):
 		imgplot = plt.imshow(img)
 
 		#plt.show()
+
+	def save(self,name):
+		genome = self.getGenes()
+		pickle.dump( genome, open(name, "wb" ))
+
+	@staticmethod
+	def recall(name = "master.gen"):
+		return pickle.load(open(name, "rb" ) )

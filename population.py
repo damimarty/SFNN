@@ -30,7 +30,7 @@ class Population(object):
 		self.peopleList = sorted(self.peopleList, key = lambda people: -people.getFitness())
 
 	def getBestFitness(self):
-		return min([p.getFitness() for p in self.peopleList])
+		return max([p.getFitness() for p in self.peopleList])
 
 	def clean(self):
 		self.peopleList = []

@@ -15,7 +15,8 @@ class Genetics(object):
     def __init__(self, nbPeople = 100, nbNeu = 10, nbConn = 10, nbNeuInput = 2, nbNeuOutput = 1, genomes = None):
         self.pbaNewNeuron = 0.02
         self.pbaNewConnexion = 0.05
-        self.pbaChangeConnexion = 0.05
+        self.pbaChangeConnexionLink = 0.01
+        self.pbaChangeConnexionWeight = 0.01
         self.pbaDeleteNeuron = 0.01
         self.pbaDeleteConnexion = 0.03
         self.elitism = 2
@@ -43,17 +44,7 @@ class Genetics(object):
             for i in range(nGenerations):
                 # Iterate over population
                 # t = time.time()
-                for nn in self.generationN.peopleList:
-                    error = 0.0
-                    inputs = self.problem.getInputs()
-                    # Apply nEvaluations times our inputs
-                    for j in range(nEvaluations):
-                        o1 = self.problem.run(inputs)
-                        nn.setInput(inputs)
-                        nn.evaluateNetwork()
-                        o2 = nn.getOutput()
-                        error += self.problem.error(o2,o1)
-                    nn.setFitness(0.1/(0.1+(error/nEvaluations)))
+                self.do(nEvaluations)
                 # print("eval",time.time()-t)
                 # Save genetics data of the current generation
                 if(self.saveEvolution):
@@ -73,6 +64,19 @@ class Genetics(object):
                 print("next age : %d"%i)
         else:
             print("no problem defined")
+
+    def do(self,nEvaluations):
+        for nn in self.generationN.peopleList:
+            error = 0.0
+            # Apply nEvaluations times our inputs
+            for j in range(nEvaluations):
+                inputs = self.problem.getInputs()
+                o1 = self.problem.run(inputs)
+                nn.setInput(inputs)
+                nn.evaluateNetwork()
+                o2 = nn.getOutput()
+                error += self.problem.error(o2,o1)
+            nn.setFitness(0.1/(0.1+(error/nEvaluations)))
 
     def step(self):
         self.generationN.sortByFitness()
@@ -106,6 +110,11 @@ class Genetics(object):
 
     def loop(self):
         self.generationN.setPopulation(self.generationNplusOne.getPopulation())
+
+    def getBest(self):
+        self.do(100)
+        self.generationN.sortByFitness()
+        return self.generationN.peopleList[0]
 
     def getSpieces(self):
         return self.generationN.getSpieces()
@@ -159,10 +168,20 @@ class Genetics(object):
 
     def mutate(self,(n,c)):
         # connexion weight
-        if(self.yesOrNo(self.pbaChangeConnexion)):
+        if(self.yesOrNo(self.pbaChangeConnexionLink)):
+            # print("mutateC")
             indexConnMutation = int(len(c)*random.random())
             src, dest, weight = c[indexConnMutation]
             c[indexConnMutation] = src, dest, random.random()
+        if(self.yesOrNo(self.pbaChangeConnexionWeight)):
+            # print("mutateN")
+            indexConnMutation = int(len(c)*random.random())
+            src, dest, weight = c[indexConnMutation]
+            newConnIndex = int(len(n)*random.random())
+            if(self.yesOrNo(0.5)):
+                c[indexConnMutation] = newConnIndex, dest, weight
+            else:
+                c[indexConnMutation] = src, newConnIndex, weight
         return n,c
 
     def computeEvolution(self):
