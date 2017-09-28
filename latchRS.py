@@ -4,6 +4,7 @@
 
 from genetics import Genetics
 from network import Network
+from math import sqrt
 import matplotlib.pyplot as plt
 import random
 
@@ -22,60 +23,33 @@ class latchRS(object):
 				self.output = 0.2
 			else:
 				self.output = 0.8
-		return self.output
+		return [self.output]
 
-def testPool():
-	latch = latchRS()
+	def getInputs(self):
+		iSet = 1.0 if random.random() > 0.9 else 0.0
+		iReset = 1.0 if random.random() < 0.1 else 0.0
+		return [iSet,iReset]
+
+	def error(self,o1,o2):
+		if (len(o1) == 1) and (len(o2) == 1):
+			v = o1[0] - o2[0]
+			return v**2
+
+
+def train():
+	# Create our base Network
 	base = Network(10, 10, 2, 1)
 	baseGenome = base.getGenes()
 	pool = Genetics(genome = baseGenome)
-	nEvaluation = 20
-	nRetain = 5
-	individualSpecies = []
-	speciesData = []
-	fitnesses = []
-	# nb generation
-	for age in range(50):
-		for people in pool.generationN.peopleList:
-			error = 0.0
-			for i in range(nEvaluation):
-				iSet = 1.0 if random.random() > 0.9 else 0.0
-				iReset = 1.0 if random.random() < 0.1 else 0.0
-				for j in range(nRetain):
-					inputArray = [iSet, iReset]
-					expected = latch.run(inputArray)
-					people.evaluateNetwork()
-					error += abs(people.getOutput()[0]- expected)
-			people.setFitness((nEvaluation*nRetain)/error)
-		print("next age: %d"%(age))
-		fitnesses.append(pool.generationN.getBestFitness())
-		pool.step()
-		sp = pool.getSpieces()
-		for gsp,c in sp:
-			if gsp not in individualSpecies:
-				individualSpecies.append(gsp)
-		speciesData.append(sp)
-		pool.loop()
-
-	evolution = [[] for i in range(len(individualSpecies))]
-	print(len(evolution))
-
-	for data in speciesData:
-		for g in individualSpecies:
-			found = False
-			for genome,count in data:
-				#print(genome,g)
-				if Network.isSameGenome(genome,g):
-					found = True
-					evolution[individualSpecies.index(genome)].append(count)
-			if not found:
-				evolution[individualSpecies.index(g)].append(0)
+	pool.setProblem(latchRS())
+	pool.train(20,50)
+	evolution = pool.computeEvolution()
 
 	for speEvo in evolution:
 		plt.plot(speEvo)
 
 	plt.figure()
-	plt.plot(fitnesses)
+	plt.plot(pool.fitnesses)
 	plt.show()
 
-testPool()
+train()

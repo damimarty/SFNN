@@ -6,6 +6,8 @@ from population import Population
 from network import Network
 import random
 import matplotlib.pyplot as plt
+import time
+
 defaultNbIndividuals = 5
 defaultNbNeurons = 5
 defaultNbConnexions = 8
@@ -18,18 +20,81 @@ class Genetics(object):
         self.pbaDeleteConnexion = 0.03
         self.elitism = 2
         self.wheelSize = 0.0
+
+        # Our parent generation
         self.generationN = Population(nbPeople, nbNeu, nbConn, nbNeuInput, nbNeuOutput, genome)
+        # Our child generation
         self.generationNplusOne = Population(nbPeople, nbNeu, nbConn, nbNeuInput, nbNeuOutput, genome)
         self.computeWheelSize()
 
+        self.fitnesses = []
+        self.speciesData = []
+        self.individualSpecies = []
+
+        self.problem = None
+
+    def setProblem(self,pb):
+        self.problem = pb
+
+    def train(self, nGenerations, nEvaluations):
+        if self.problem != None:
+            # N generations
+            for i in range(nGenerations):
+                # Iterate over population
+                t = time.time()
+                for nn in self.generationN.peopleList:
+                    error = 0.0
+                    inputs = self.problem.getInputs()
+                    # Apply nEvaluations times our inputs
+                    for j in range(nEvaluations):
+                        o1 = self.problem.run(inputs)
+                        nn.setInput(inputs)
+                        nn.evaluateNetwork()
+                        o2 = nn.getOutput()
+                        error += self.problem.error(o2,o1)
+                    nn.setFitness(1/(1+(error/nEvaluations)))
+                print("eval",time.time()-t)
+                # Save genetics data of the current generation
+                t = time.time()
+                self.saveData()
+                print("save",time.time()-t)
+                # Do a genetic step
+                t = time.time()
+                self.step()
+                print("step",time.time()-t)
+                # Copy child generation -> parent generation
+                t = time.time()
+                self.loop()
+                print("loop",time.time()-t)
+                print("next age : %d"%i)
+        else:
+            print("no problem defined")
 
     def step(self):
         self.generationN.sortByFitness()
+        self.computeWheelSize()
         self.generationNplusOne.clean()
-        #copy best individuals
+        # copy best individuals
         self.generationNplusOne.extend(self.generationN.getFirsts(self.elitism))
+        # fornicate the rest of population
         for i in range(self.generationN.size()-self.elitism):
             self.generationNplusOne.append(self.fornicate())
+
+    def saveData(self):
+        # Get the best fitnesses
+        self.fitnesses.append(self.generationN.getBestFitness())
+        sp = self.getSpieces()
+        # save the current spieces and counts
+        self.speciesData.append(sp)
+        # check if new spiece born
+        for gsp,c in sp:
+            found = False
+            for iSpecies in self.individualSpecies:
+                if Network.isSameGenome(iSpecies,gsp):
+                    found = True
+                    break
+            if not found:
+                self.individualSpecies.append(gsp)
 
     def loop(self):
         self.generationN.setPopulation(self.generationNplusOne.getPopulation())
@@ -38,6 +103,7 @@ class Genetics(object):
         return self.generationN.getSpieces()
 
     def computeWheelSize(self):
+        self.wheelSize = 0.0
         for people in self.generationN.peopleList:
             self.wheelSize += people.getFitness()
 
@@ -84,3 +150,19 @@ class Genetics(object):
         else:
             child = Network(genes = (neuronsChild,connexionsChild))
         return child
+
+    def computeEvolution(self):
+        evolution = [[] for i in range(len(self.individualSpecies))]
+        print(len(evolution))
+
+        for data in self.speciesData:
+            for g in self.individualSpecies:
+                found = False
+                for genome,count in data:
+                    #print(genome,g)
+                    if Network.isSameGenome(genome,g):
+                        found = True
+                        evolution[self.individualSpecies.index(genome)].append(count)
+                if not found:
+                    evolution[self.individualSpecies.index(g)].append(0)
+        return evolution
