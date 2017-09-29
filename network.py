@@ -186,7 +186,7 @@ class Network(object):
 	def getFitness(self):
 		return self.fitness
 
-	def draw(self):
+	def draw(self,name = 'net'):
 
 		self.g = pgv.AGraph(directed=True)
 
@@ -205,14 +205,14 @@ class Network(object):
 			self.g.add_edge(f,t,arrowhead="normal",arrowsize=1.0,color="red",penwidth=(conn.w+1)*2)
 
 		print(self.g.string())
-		self.g.write('net.dot')
+		self.g.write(name+".dot")
 
-		gFile=pgv.AGraph('net.dot') # create a new graph from file
+		gFile=pgv.AGraph(name+".dot") # create a new graph from file
 		gFile.layout() # layout with default (neato)
-		gFile.draw('net.png') # draw png
+		gFile.draw(name+".png") # draw png
 
-		img=mpimg.imread('net.png')
-		imgplot = plt.imshow(img)
+		#img=mpimg.imread(name+".png")
+		#imgplot = plt.imshow(img)
 
 		#plt.show()
 

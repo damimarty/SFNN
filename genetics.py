@@ -15,12 +15,14 @@ class Genetics(object):
     def __init__(self, nbPeople = 100, nbNeu = 10, nbConn = 10, nbNeuInput = 2, nbNeuOutput = 1, genomes = None):
         self.pbaNewNeuron = 0.02
         self.pbaNewConnexion = 0.05
-        self.pbaChangeConnexionLink = 0.01
-        self.pbaChangeConnexionWeight = 0.01
+        self.pbaChangeConnexionLink = 0.05
+        self.pbaChangeConnexionWeight = 0.05
         self.pbaDeleteNeuron = 0.01
         self.pbaDeleteConnexion = 0.03
-        self.elitism = 2
+        self.elitism = 5
         self.wheelSize = 0.0
+
+        self.bestSavedFitness = 0.0
 
         # Our parent generation
         self.generationN = Population(nbPeople, nbNeu, nbConn, nbNeuInput, nbNeuOutput, genomes)
@@ -61,7 +63,7 @@ class Genetics(object):
                 # t = time.time()
                 self.loop()
                 # print("loop",time.time()-t)
-                print("next age : %d"%i)
+                print("next age : %d (%f)"%(i,self.getBest().fitness))
         else:
             print("no problem defined")
 
@@ -76,10 +78,15 @@ class Genetics(object):
                 nn.evaluateNetwork()
                 o2 = nn.getOutput()
                 error += self.problem.error(o2,o1)
-            nn.setFitness(0.1/(0.1+(error/nEvaluations)))
+            nn.setFitness(1/(error/nEvaluations))
 
     def step(self):
         self.generationN.sortByFitness()
+        nn = self.generationN.peopleList[0]
+        if(nn.fitness > self.bestSavedFitness):
+            self.bestSavedFitness = nn.fitness
+            nn.save("bests/superBest%d.gen"%self.bestSavedFitness)
+            nn.draw("bests/superBest%d"%self.bestSavedFitness)
         self.computeWheelSize()
         self.generationNplusOne.clean()
         # copy best individuals
@@ -93,8 +100,6 @@ class Genetics(object):
         self.fitnesses.append(self.generationN.getBestFitness())
 
     def saveEvolution(self):
-        # Get the best fitnesses
-        self.fitnesses.append(self.generationN.getBestFitness())
         sp = self.getSpieces()
         # save the current spieces and counts
         self.speciesData.append(sp)
@@ -114,6 +119,7 @@ class Genetics(object):
     def getBest(self):
         self.do(100)
         self.generationN.sortByFitness()
+        # print([p.getFitness() for p in self.generationN.peopleList])
         return self.generationN.peopleList[0]
 
     def getSpieces(self):

@@ -32,5 +32,5 @@ class latchRS(object):
     def error(self,o1,o2):
         if (len(o1) == 1) and (len(o2) == 1):
             v = abs(o1[0] - o2[0])
-            # return v**2
+            #return v**2
             return v

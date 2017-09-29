@@ -39,8 +39,10 @@ def execLatch(name):
 	plt.plot(a_inputR[10:])
 	plt.plot(a_inputS[10:])
 	plt.plot(a_expected[10:])
-	plt.figure()
 	plt.plot(a_output[10:])
 
-execLatch("best.gen")
+#execLatch("bests/superBest144.gen")
+execLatch("bests/superBest871.gen")
+#execLatch("bests/superBest312039.gen")
+#312039
 plt.show()

@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 
 def train():
 	# Create our base Network
-	pool = Genetics(genomes = [Network.recall()])
+	pool = Genetics(nbPeople = 70,genomes = [Network.recall()])
 	pool.setProblem(latchRS())
-	pool.train(100,50)
+	pool.train(100,800)
 
 	"""
 	if(pool.evolution):
@@ -20,15 +20,15 @@ def train():
 			plt.plot(speEvo)
 	"""
 
-	bestnn = pool.getBest()
-	plt.figure()
-	bestnn.draw()
-	plt.show()
-	bestnn.save("best.gen")
-
 	plt.figure()
 	plt.plot(pool.fitnesses)
 
+	bestnn = pool.getBest()
+	plt.figure()
+	bestnn.draw("best")
+	print(bestnn.fitness)
+	plt.show()
+	bestnn.save("best.gen")
 
 train()
 
