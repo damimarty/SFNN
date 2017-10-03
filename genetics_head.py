@@ -43,37 +43,41 @@ class Genetics(object):
             # N generations
             for i in range(nGenerations):
                 # Iterate over population
+                # t = time.time()
                 self.do(nEvaluations, scenario)
+                # print("eval",time.time()-t)
                 # Save genetics data of the current generation
                 # if(self.saveEvolution):
+                    # t = time.time()
                     # self.saveData()
+                    # print("save",time.time()-t)
                 # Save fitness
-                # self.saveEvolution()
-                best = self.saveFitness()
+                self.saveEvolution()
+                # self.saveFitness()
                 # Do a genetic step
+                # t = time.time()
                 self.step()
+                # print("step",time.time()-t)
                 # Copy child generation -> parent generation
+                # t = time.time()
                 self.loop()
-                print "Generation "+str(i)+"\t"+str(best)
                 # print("loop",time.time()-t)
-                # print("next age : %d"%i)
+                print("next age : %d"%i)
         else:
             print("no problem defined")
 
     def do(self,nEvaluations, scenario = None):
-        identifierPeople = 0
         for nn in self.generationN.peopleList:
-            # print "People "+str(identifierPeople)
             error = 0.0
             # Apply nEvaluations times our inputs
             if scenario is None:
                 for j in range(nEvaluations):
                     inputs = self.problem.getInputs()
+                    o1 = self.problem.run(inputs)
                     nn.setInput(inputs)
                     nn.evaluateNetwork()
-                    commands = nn.getOutput()
-                    self.problem.run(commands)
-                    # error += self.problem.error(o2,o1)
+                    o2 = nn.getOutput()
+                    error += self.problem.error(o2,o1)
             else:
                 for j in range(len(scenario)):
                     inputs = scenario[j]
@@ -82,10 +86,8 @@ class Genetics(object):
                     nn.evaluateNetwork()
                     o2 = nn.getOutput()
                     error += self.problem.error(o2,o1)
-            fit = self.problem.reinit()
-            # print fit
-            nn.setFitness(fit)
-            identifierPeople +=1
+            
+            nn.setFitness(0.1/(0.1+(error/nEvaluations)))
 
     def step(self):
         self.generationN.sortByFitness()
@@ -95,14 +97,11 @@ class Genetics(object):
         self.generationNplusOne.extend(self.generationN.getFirsts(self.elitism))
         # fornicate the rest of population
         for i in range(self.generationN.size()-self.elitism):
-            # print "Fornication n"+str(i)
             self.generationNplusOne.append(self.fornicate())
 
     def saveFitness(self):
         # Get the best fitnesses
-        best = self.generationN.getBestFitness()
-        self.fitnesses.append(best)
-        return best
+        self.fitnesses.append(self.generationN.getBestFitness())
 
     def saveEvolution(self):
         # Get the best fitnesses
@@ -156,7 +155,7 @@ class Genetics(object):
     def getParents(self):
         parent1 = self.drawLot()
         parent2 = self.drawLot()
-        while parent2 == parent1 or parent2 == None:
+        while parent2 == parent1:
             parent2 = self.drawLot()
         return parent1, parent2
 
@@ -170,7 +169,6 @@ class Genetics(object):
         # Mutation part
         neuronsChild,connexionsChild =  self.mutate((neuronsChild,connexionsChild))
         child = Network(genes = (neuronsChild,connexionsChild))
-        child.clean()
         return child
 
     def crossOver(self,(n1,c1),(n2,c2)):
@@ -200,12 +198,12 @@ class Genetics(object):
             else:
                 c[indexConnMutation] = src, newConnIndex, weight
         # new connexion
-        # if(self.yesOrNo(self.pbaNewConnexion)):
-            # print("new Connexion")
-            # neuron1 = random.randint(0,len(n)-1)
-            # neuron2 = random.randint(0,len(n)-1)
-            # tuple = neuron1, neuron2, random.random()
-            # c.append(tuple)
+        if(self.yesOrNo(self.pbaNewConnexion)):
+            print("new Connexion")
+            neuron1 = random.randint(0,len(n)-1)
+            neuron2 = random.randint(0,len(n)-1)
+            tuple = neuron1, neuron2, random.random()
+            c.append(tuple)
         return n,c
 
     def computeEvolution(self):

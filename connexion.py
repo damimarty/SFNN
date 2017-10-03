@@ -9,11 +9,11 @@ class Connexion(object):
 		"""blah"""
 		self.From = From
 		self.To = To
-		if w is None: self.w = random.random() * 2.0 - 1.0
+		if w is None: self.w = 3.0*(random.random() * 2.0 - 1.0)
 		else: self.w = w
 
 	def setW(self, w = None):
-		if w is None: self.w = random.random() * 2.0 - 1.0
+		if w is None: self.w = 3.0*(random.random() * 2.0 - 1.0)
 		else: self.w = w
 
 	def getW(self):

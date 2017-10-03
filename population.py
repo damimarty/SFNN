@@ -7,10 +7,13 @@ from network import Network
 class Population(object):
 	def __init__(self, nbPeople, nbNeurons = 5, nbConnexions = 5, nbInputs = 2, nbOutputs = 1, genomes = None):
 		self.peopleList = []
-		divisions = len(genomes)
-		for i in range(divisions):
-			for j in range(nbPeople/divisions):
-				self.createNetwork(nbNeurons, nbConnexions, nbInputs, nbOutputs, genomes[i])
+		if genomes is None:
+			for j in range(nbPeople):
+				self.createNetwork(nbNeurons, nbConnexions, nbInputs, nbOutputs, None)
+		else:
+			for i in range(divisions):
+				for j in range(nbPeople/divisions):
+					self.createNetwork(nbNeurons, nbConnexions, nbInputs, nbOutputs, genomes[i])
 
 	def createNetwork(self, nbNeurons = 5, nbConnexions = 5, nbInputs = 2, nbOutputs = 1, genome = None):
 		self.peopleList.append(Network(nbNeurons, nbConnexions, nbInputs, nbOutputs, genome))
@@ -67,4 +70,21 @@ class Population(object):
 					break
 			if not found:
 				spieces.append((g,1))
+		return spieces
+
+	def getGenotypes(self):
+		spieces = []
+		count = []
+		for n in self.peopleList:
+			nbN, nbC = n.getGenotype()
+			found = False
+			for i in range(len(spieces)):
+				(nbNn, nbCc), count = spieces[i]
+				if nbNn == nbN and nbCc == nbC:
+					spieces[i] = ((nbN, nbC),count+1)
+					found = True
+					break
+			if not found:
+				print "not found"
+				spieces.append(((nbN, nbC),1))
 		return spieces
