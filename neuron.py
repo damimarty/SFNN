@@ -26,7 +26,7 @@ class Neuron(object):
 		self.sum += value
 
 	def compute(self):
-		self.output = 1.0/(1.0+math.exp(-self.sum))
+		self.output = (1.0/(1.0+math.exp(-self.sum)))*2.0-1.0
 		self.sum = 0.0
 
 class InputNeuron(Neuron):

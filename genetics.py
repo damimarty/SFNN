@@ -59,6 +59,7 @@ class Genetics(object):
                 # print("next age : %d"%i)
         else:
             print("no problem defined")
+        return self.fitnesses
 
     def do(self,nEvaluations, scenario = None):
         identifierPeople = 0

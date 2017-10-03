@@ -65,6 +65,7 @@ class Network(object):
 				self.createNeuron("output")
 			for idConnexion in range(nbConnexions):
 				self.createConnexion()
+			self.clean()
 
 	def isSame(self,other):
 		return self.isSameGenome(self.getGenes(),other.getGenes())
@@ -159,7 +160,7 @@ class Network(object):
 		# this is not forbidden to imagine getting a feedback on how much the network controls some output,
 		# so next line is commented
 		# while self.neuronList[neuron1].amIOutput() : neuron1 = random.randint(0,nbNeurons-1)
-		#while self.neuronList[neuron2].amIInput() : neuron2 = random.randint(0,nbNeurons-1)
+		while type(self.neuronList[neuron2]) is InputNeuron : neuron2 = random.randint(0,self.nbNeurons-1)
 		self.connexionList.append(Connexion(self.neuronList[neuron1],self.neuronList[neuron2]))
 		self.nbConnexions += 1
 

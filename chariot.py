@@ -19,16 +19,14 @@ class Chariot(object):
             fitness = self.position
         else: fitness = 5.0 - self.position
         fitness += self.fitness
-        self.position = 0.0
-        self.hasLoad = True
-        self.fitness = -5.0
-        self.contact = 1.0
+        self.__init__()
         return fitness if fitness > 0.1 else 0.1
         
     def run(self, inputArray, verbose = None):
-        left = inputArray[0]
-        right = inputArray[1]
-        self.position += -left + right
+        command = inputArray[0]
+        # right = inputArray[1]
+        # self.position += -left + right
+        self.position += command
         if self.position <=0.0:
             self.position = 0.0
             if not self.hasLoad:
@@ -50,15 +48,18 @@ class Chariot(object):
         return [False]
 
     def getInputs(self):
-        self.contact = self.contact * 0.55
-        # self.contact = 0.0
+        # self.contact = self.contact * 0.55
+        self.contact = 0.0
         if self.position == 0.0:
             self.contact = 1.0
         if self.position == 5.0:
             self.contact = -1.0
         # return [1.0 if self.hasLoad else -1.0]
         # return [self.contact]
-        return [5.0-self.position,self.position-5.0]
+        # return [5.0-self.position,self.position-5.0]
+        # return [5.0-self.position,self.contact]
+        # return [self.position,self.contact]
+        return [self.contact]
         
     
 

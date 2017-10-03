@@ -12,13 +12,14 @@ import matplotlib.pyplot as plt
 def train():
 	# Create our base Network
 	# pool = Genetics(genomes = [Network.recall()])
-	pool = Genetics(nbPeople = 150, nbNeu = 8, nbConn = 15, nbNeuInput = 2, nbNeuOutput = 2)
+	pool = Genetics(nbPeople = 150, nbNeu = 8, nbConn = 15, nbNeuInput = 1, nbNeuOutput = 1)
 	pool.setProblem(Chariot())
 	# scenario = pool.problem.getScenario(500)
 	# pool.train(500,50,scenario)
 	char = 'y'
+	fitnesses = []
 	while char == 'y':
-		pool.train(100,300)
+		fitnesses += pool.train(5,300)
 		char = raw_input("Continue ? (y or n)")
 
 	"""
@@ -36,24 +37,32 @@ def train():
 	bestnn.printNetwork()
 	testChariotOnBest(bestnn)
 	# plt.figure()
-	# plt.plot(pool.fitnesses)
+	plt.plot(pool.fitnesses)
+	# plt.plot(fitnesses)
 	# plt.figure()
 	# plt.plot(evolution)
 
 def testChariotOnBest(bestNetwork):
 	char = Chariot()
+	route = []
+	listinputs = []
 	for i in range(100):
 		inputs = char.getInputs()
 		bestNetwork.setInput(inputs)
 		bestNetwork.evaluateNetwork()
 		commands = bestNetwork.getOutput()
-		char.run(commands, verbose = True)
-		print char.position
+		char.run(commands, verbose = False)
+		# print char.position
+		route.append(char.position)
+		listinputs.append(inputs[0])
 	fit = char.reinit()
-	print fit
+	print "fit = "+str(fit)
 	bestNetwork.printNetwork()
 	bestNetwork.clean()
 	bestNetwork.printNetwork()
+	plt.plot(route)
+	plt.plot(listinputs)
+	plt.figure()
 
 def testChariot():
 	char = Chariot()
