@@ -7,7 +7,7 @@ from neuron import Neuron
 from neuron import InputNeuron
 from neuron import OutputNeuron
 
-import pygraphviz as pgv
+# import pygraphviz as pgv
 
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -65,6 +65,7 @@ class Network(object):
 				self.createNeuron("output")
 			for idConnexion in range(nbConnexions):
 				self.createConnexion()
+			self.clean()
 
 	def isSame(self,other):
 		return self.isSameGenome(self.getGenes(),other.getGenes())
@@ -72,15 +73,20 @@ class Network(object):
 	@staticmethod
 	def isSameGenome((n1,c1),(n2,c2)):
 		# neurons
-		same = True
-		for nelem1,nelem2 in zip(n1,n2):
-			if((nelem1[0] != nelem2[0]) or (nelem1[1] != nelem2[1])):
-				same = False
+		# same = True
+		return len(n1)==len(n2) and len(c1)==len(c2)
+		# for nelem1,nelem2 in zip(n1,n2):
+			# if((nelem1[0] != nelem2[0]) or (nelem1[1] != nelem2[1])):
+				# same = False
 		# connexions
-		for nelem1,nelem2 in zip(c1,c2):
-			if((nelem1[0] != nelem2[0]) or (nelem1[1] != nelem2[1]) or (nelem1[2] != nelem2[2])):
-				same = False
+		# for nelem1,nelem2 in zip(c1,c2):
+			# if((nelem1[0] != nelem2[0]) or (nelem1[1] != nelem2[1]) or (nelem1[2] != nelem2[2])):
+				# same = False
 		return same
+		
+	@staticmethod
+	def isSameGenotype((n1,c1),(n2,c2)):
+		return n1==n2 and c1==c2
 
 	def getNeuronPosition(self, neuron):
 		return self.neuronList.index(neuron)
@@ -107,6 +113,10 @@ class Network(object):
 		for c in self.sortedConnexions():
 			genesConnexions.append((c.getFrom(),c.getTo(),c.getW()))
 		return genesNeurons, genesConnexions
+
+	def getGenotype(self):
+		genesNeurons, genesConnexions = self.getGenes()
+		return len(genesNeurons), len(genesConnexions)
 
 	def printNetwork(self):
 		print "My species is "+self.species
@@ -139,10 +149,10 @@ class Network(object):
 			neuron.compute()
 
 	def extractNeuronsOutputs(self):
-	    r = []
-	    for neuron in self.neuronList:
-	        r.append(neuron.getOutput())
-	    return r
+		r = []
+		for neuron in self.neuronList:
+			r.append(neuron.getOutput())
+		return r
 
 	def createConnexion(self):
 		neuron1 = random.randint(0,self.nbNeurons-1)
@@ -150,7 +160,7 @@ class Network(object):
 		# this is not forbidden to imagine getting a feedback on how much the network controls some output,
 		# so next line is commented
 		# while self.neuronList[neuron1].amIOutput() : neuron1 = random.randint(0,nbNeurons-1)
-		#while self.neuronList[neuron2].amIInput() : neuron2 = random.randint(0,nbNeurons-1)
+		while type(self.neuronList[neuron2]) is InputNeuron : neuron2 = random.randint(0,self.nbNeurons-1)
 		self.connexionList.append(Connexion(self.neuronList[neuron1],self.neuronList[neuron2]))
 		self.nbConnexions += 1
 
@@ -186,33 +196,33 @@ class Network(object):
 	def getFitness(self):
 		return self.fitness
 
-	def draw(self,name = 'net'):
+	def draw(self):
+		pass
+		# self.g = pgv.AGraph(directed=True)
 
-		self.g = pgv.AGraph(directed=True)
+		# for node in self.neuronList:
+			# color = "white"
+			# if type(node) is OutputNeuron:
+				# color = "red"
+			# elif type(node) is InputNeuron:
+				# color = "blue"
+			# print(node.Id,color)
+			# self.g.add_node(str(node.Id),style="filled",fillcolor=color)
 
-		for node in self.neuronList:
-			color = "white"
-			if type(node) is OutputNeuron:
-				color = "red"
-			elif type(node) is InputNeuron:
-				color = "blue"
-			print(node.Id,color)
-			self.g.add_node(str(node.Id),style="filled",fillcolor=color)
+		# for conn in self.connexionList:
+			# f = str(conn.From.Id)
+			# t = str(conn.To.Id)
+			# self.g.add_edge(f,t,arrowhead="normal",arrowsize=1.0,color="red",penwidth=(conn.w+1)*2)
 
-		for conn in self.connexionList:
-			f = str(conn.From.Id)
-			t = str(conn.To.Id)
-			self.g.add_edge(f,t,arrowhead="normal",arrowsize=1.0,color="red",penwidth=(conn.w+1)*2)
+		# print(self.g.string())
+		# self.g.write('net.dot')
 
-		print(self.g.string())
-		self.g.write(name+".dot")
+		# gFile=pgv.AGraph('net.dot') # create a new graph from file
+		# gFile.layout() # layout with default (neato)
+		# gFile.draw('net.png') # draw png
 
-		gFile=pgv.AGraph(name+".dot") # create a new graph from file
-		gFile.layout() # layout with default (neato)
-		gFile.draw(name+".png") # draw png
-
-		#img=mpimg.imread(name+".png")
-		#imgplot = plt.imshow(img)
+		# img=mpimg.imread('net.png')
+		# imgplot = plt.imshow(img)
 
 		#plt.show()
 
@@ -220,6 +230,37 @@ class Network(object):
 		genome = self.getGenes()
 		pickle.dump( genome, open(name, "wb" ))
 
+	def clean(self):
+		newconnexionList = []
+		# print self.connexionList
+		for connexOrig in self.connexionList:
+			frOrig = connexOrig.getFrom()
+			toOrig = connexOrig.getTo()
+			new_w = connexOrig.getW()
+			for connex in self.connexionList:
+				if connex is not connexOrig:
+					fr = connex.getFrom()
+					to = connex.getTo()
+					if fr is frOrig and to is toOrig:
+						#the two connexions link the same neurons
+						new_w += connex.getW()
+			add = True
+			for new_connex in newconnexionList:
+				fr = new_connex.getFrom()
+				to = new_connex.getTo()
+				if fr is frOrig and to is toOrig:
+					add = False
+			if add:
+				newconnexionList.append(Connexion(frOrig,toOrig,new_w))
+		self.connexionList = newconnexionList
+		self.nbConnexions = len(newconnexionList)
+		
+		
+		
 	@staticmethod
 	def recall(name = "master.gen"):
 		return pickle.load(open(name, "rb" ) )
+
+		
+		
+		

@@ -26,22 +26,25 @@ class Neuron(object):
 		self.sum += value
 
 	def compute(self):
-		self.output = 1.0/(1.0+math.exp(-self.sum))
+		if sum < -20.0:
+			self.output = 1.0
+		else:
+			self.output = (1.0/(1.0+math.exp(-self.sum)))*2.0-1.0
 		self.sum = 0.0
 
 class InputNeuron(Neuron):
-    def __init__(self, id = -1, bias = None):
-        Neuron.__init__(self,id,bias)
+	def __init__(self, id = -1, bias = None):
+		Neuron.__init__(self,id,bias)
 
-    def setInput(self, inputValue):
-        # coerce to [1:0] ?
-        self.sum = inputValue
+	def setInput(self, inputValue):
+		# coerce to [1:0] ?
+		self.sum = inputValue
 
-    def updateSum(self, value):
-        pass
+	def updateSum(self, value):
+		pass
 
-    def compute(self):
-        self.output = self.sum
+	def compute(self):
+		self.output = self.sum
 
 class OutputNeuron(Neuron):
 

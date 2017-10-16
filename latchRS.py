@@ -25,8 +25,8 @@ class latchRS(object):
         return [self.output]
 
     def getInputs(self):
-        iSet = 1.0 if random.random() > 0.90 else 0.0
-        iReset = 1.0 if random.random() < 0.10 else 0.0
+        iSet = 1.0 if random.random() > 0.92 else 0.0
+        iReset = 1.0 if random.random() < 0.08 else 0.0
         return [iSet,iReset]
         
     def getScenario(self, size):
