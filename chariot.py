@@ -1,0 +1,71 @@
+#!/usr/bin/python
+# -*- Python -*-
+# -*- coding: latin-1 -*-
+
+from genetics import Genetics
+from network import Network
+
+import random
+
+class Chariot(object):
+    def __init__(self):
+        self.position = 0.00
+        self.hasLoad = True
+        self.fitness = -5.0
+        self.contactG = 0.0
+        self.contactD = 0.0
+
+    def reinit(self):
+        if self.hasLoad:
+            fitness = self.position
+        else: fitness = 5.0 - self.position
+        fitness += self.fitness
+        self.__init__()
+        return fitness if fitness > 0.1 else 0.1
+        
+    def run(self, inputArray, verbose = None):
+        command = inputArray[0]
+        # right = inputArray[1]
+        # self.position += -left + right
+        self.position += command
+        if self.position <=0.0:
+            self.position = 0.0
+            if not self.hasLoad:
+                if verbose == True:
+                    print "Got LOAD"
+                self.contact = 1.0
+                self.hasLoad = True
+                self.fitness += 5.0
+        if self.position >=5.0:
+            self.position = 5.0
+            if self.hasLoad:
+                if verbose == True:
+                    print "Left LOAD"
+                self.contact = -1.0
+                self.hasLoad = False
+                self.fitness += 5.0
+        # print self.position
+
+        return [False]
+
+    def getInputs(self):
+        # self.contact = self.contact * 0.55
+        self.contactG = 0.0
+        self.contactD = 0.0
+        if self.position == 0.0:
+            self.contactG = 1.0
+        if self.position == 5.0:
+            self.contactG = 1.0
+            # self.contactD = 1.0
+        return [self.contactG]
+        # return [self.contactG, self.contactD]
+
+    
+    def getIOspec(self):
+        return [1,1]
+
+    def error(self,o1,o2):
+        if (len(o1) == 1) and (len(o2) == 1):
+            v = abs(o1[0] - o2[0])
+            # return v**2
+            return v
