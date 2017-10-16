@@ -12,7 +12,7 @@ def train():
 	# Create our base Network
 	pool = Genetics(nbPeople = 70,genomes = [Network.recall()])
 	pool.setProblem(latchRS())
-	pool.train(100,800)
+	pool.train(nGenerations = 1000,nEvaluations=50)
 
 	"""
 	if(pool.evolution):

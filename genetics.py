@@ -40,7 +40,9 @@ class Genetics(object):
     def setProblem(self,pb):
         self.problem = pb
 
+
     def train(self, nGenerations, nEvaluations):
+        self.scenario = self.problem.getScenario(nEvaluations)
         if self.problem != None:
             # N generations
             for i in range(nGenerations):
@@ -71,8 +73,9 @@ class Genetics(object):
         for nn in self.generationN.peopleList:
             error = 0.0
             # Apply nEvaluations times our inputs
-            for j in range(nEvaluations):
-                inputs = self.problem.getInputs()
+            #for j in range(nEvaluations):
+            #    inputs = self.problem.getInputs()
+            for inputs in self.scenario:
                 o1 = self.problem.run(inputs)
                 nn.setInput(inputs)
                 nn.evaluateNetwork()
